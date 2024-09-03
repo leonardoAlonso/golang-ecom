@@ -40,7 +40,8 @@ func (s *ApiServer) Run() error {
 	subrouter := router.PathPrefix("/api/v1").Subrouter()
 
 	// Create a new handler
-	userHandler := user.NewHandler()
+	userStore := user.NewStore(s.db)          // dependency injection
+	userHandler := user.NewHandler(userStore) // dependency injection
 	// Register the routes
 	userHandler.RegisterRoutes(subrouter)
 
