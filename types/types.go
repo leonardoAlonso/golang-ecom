@@ -8,7 +8,7 @@ type UserStore interface {
 	// this will helps to create a mock store for testing
 	// and also to create a real store that interacts with the database
 	GetUserByEmail(email string) (*User, error)
-	CreateUser(u *User) error
+	CreateUser(u User) error
 	GetUserByID(id int) (*User, error)
 }
 
@@ -26,8 +26,8 @@ type RegisterUserPayload struct {
 	// which can be acquired using reflection. Usually it is used to provide
 	// transformation info on how a struct field is encoded to or decoded from
 	// another format
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
+	FirstName string `json:"first_name" validate:"required"`
+	LastName  string `json:"last_name"  validate:"required"`
+	Email     string `json:"email"      validate:"required,email"`
+	Password  string `json:"password"   validate:"required,min=3,max=20"`
 }

@@ -37,7 +37,7 @@ func (s *Store) GetUserByEmail(email string) (*types.User, error) {
 	return u, nil
 }
 
-func (s *Store) CreateUser(u *types.User) error {
+func (s *Store) CreateUser(u types.User) error {
 	return nil
 }
 

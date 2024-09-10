@@ -1,10 +1,13 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 
+	"github.com/leonardoAlonso/go-ecom/services/auth"
 	"github.com/leonardoAlonso/go-ecom/types"
 	"github.com/leonardoAlonso/go-ecom/utils"
 )
@@ -38,15 +41,27 @@ func (h *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 	_, err := h.store.GetUserByEmail(payload.Email)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+	fmt.Printf("Payload: %v", payload)
+	if err := utils.Validate.Struct(payload); err != nil {
+		error := err.(validator.ValidationErrors)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid payload: %s", error))
+		return
+	}
+	// Create the user
+
+	hasedPassword, err := auth.HashPassword(payload.Password)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
 	}
 
-	// Create the user
-	// TODO: hash the password before storing it
 	err = h.store.CreateUser(types.User{
 		FirstName: payload.FirstName,
 		LastName:  payload.LastName,
 		Email:     payload.Email,
-		Password:  payload.Password,
+		Password:  hasedPassword,
 	})
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
